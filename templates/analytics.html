@@ -66,15 +66,25 @@
 {% endblock %}
 
 {% block extra_js %}
+{{ type_labels|json_script:"type-labels-data" }}
+{{ type_data|json_script:"type-data-data" }}
+{{ trend_labels|json_script:"trend-labels-data" }}
+{{ trend_data|json_script:"trend-data-data" }}
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    const typeLabels = JSON.parse(document.getElementById('type-labels-data').textContent);
+    const typeData = JSON.parse(document.getElementById('type-data-data').textContent);
+    const trendLabels = JSON.parse(document.getElementById('trend-labels-data').textContent);
+    const trendData = JSON.parse(document.getElementById('trend-data-data').textContent);
+
     const ctxType = document.getElementById('costTypeChart').getContext('2d');
     new Chart(ctxType, {
         type: 'doughnut',
         data: {
-            labels: {{ type_labels|safe }},
+            labels: typeLabels,
             datasets: [{
-                data: {{ type_data|safe }},
+                data: typeData,
                 backgroundColor: [
                     '#0d6efd', '#20c997', '#ffc107', '#dc3545', '#6610f2', '#6f42c1'
                 ],
@@ -100,10 +110,10 @@
     new Chart(ctxTrend, {
         type: 'line',
         data: {
-            labels: {{ trend_labels|safe }},
+            labels: trendLabels,
             datasets: [{
                 label: 'Monthly Cost (₹)',
-                data: {{ trend_data|safe }},
+                data: trendData,
                 borderColor: '#0d6efd',
                 backgroundColor: gradient,
                 fill: true,

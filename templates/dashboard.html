@@ -81,7 +81,7 @@
                 <div class="progress" style="height: 10px; border-radius: 5px;">
                     <div class="progress-bar {% if item.score > 80 %}bg-success{% elif item.score > 50 %}bg-warning{% else %}bg-danger{% endif %} shadow-sm animate__animated animate__slideInLeft" 
                          role="progressbar" 
-                         style="width: {{ item.score }}%"></div>
+                         data-progress="{{ item.score }}"></div>
                 </div>
             </div>
             {% empty %}
@@ -163,4 +163,13 @@
         </table>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.progress-bar').forEach(function(bar) {
+            const width = bar.getAttribute('data-progress') + '%';
+            bar.style.width = width;
+        });
+    });
+</script>
 {% endblock %}
