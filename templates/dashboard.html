@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Smart Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-end mb-4" data-aos="fade-down">
+    <div>
+        <h2 class="fw-bold mb-0">Overview</h2>
+        <p class="text-muted mb-0">Welcome back! Here's what's happening with your vehicles.</p>
+    </div>
+    <div class="text-end">
+        <span class="text-muted small">Current Date</span><br>
+        <span class="fw-bold">{{ today|date:"F d, Y" }}</span>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="card border-0 bg-white p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-4">
+                    <i class="bi bi-car-front-fill text-primary fs-3"></i>
+                </div>
+                <span class="badge bg-primary rounded-pill">Active</span>
+            </div>
+            <h6 class="text-muted mb-1 fw-bold">Total Vehicles</h6>
+            <h2 class="fw-bold mb-0">{{ total_vehicles }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="card border-0 bg-white p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="bg-success bg-opacity-10 p-3 rounded-4">
+                     <i class="bi bi-currency-rupee text-success fs-3"></i>
+                </div>
+                <span class="badge bg-success rounded-pill">Invested</span>
+            </div>
+            <h6 class="text-muted mb-1 fw-bold">Total Expenses</h6>
+            <h2 class="fw-bold mb-0">₹{{ total_cost|floatformat:2 }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="card border-0 bg-white p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="bg-warning bg-opacity-10 p-3 rounded-4">
+                    <i class="bi bi-bell-fill text-warning fs-3"></i>
+                </div>
+            </div>
+            <h6 class="text-muted mb-1 fw-bold">Next Service</h6>
+            <h2 class="fw-bold mb-0">{{ upcoming_count }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+        <div class="card border-0 bg-white p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="bg-danger bg-opacity-10 p-3 rounded-4">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-3"></i>
+                </div>
+            </div>
+            <h6 class="text-muted mb-1 fw-bold">Overdue Alerts</h6>
+            <h2 class="fw-bold mb-0 text-danger">{{ overdue_count }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Health Score Card -->
+    <div class="col-lg-5" data-aos="fade-right">
+        <div class="card border-0 bg-white h-100 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Maintenance Health</h5>
+                <i class="bi bi-heart-pulse-fill text-danger"></i>
+            </div>
+            {% for item in vehicle_health %}
+            <div class="mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-bold">{{ item.name }}</span>
+                    <span class="badge {% if item.score > 80 %}bg-success{% elif item.score > 50 %}bg-warning text-dark{% else %}bg-danger{% endif %}">{{ item.score }}%</span>
+                </div>
+                <div class="progress" style="height: 10px; border-radius: 5px;">
+                    <div class="progress-bar {% if item.score > 80 %}bg-success{% elif item.score > 50 %}bg-warning{% else %}bg-danger{% endif %} shadow-sm animate__animated animate__slideInLeft" 
+                         role="progressbar" 
+                         style="width: {{ item.score }}%"></div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox text-muted display-4"></i>
+                <p class="text-muted">Add a vehicle to see health scores.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Activity Log Card -->
+    <div class="col-lg-7" data-aos="fade-left">
+        <div class="card border-0 bg-white h-100 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Recent Activity</h5>
+                <a href="{% url 'maintenance_list' %}" class="btn btn-sm btn-light rounded-pill px-3">View History</a>
+            </div>
+            <div class="list-group list-group-flush border-0">
+                {% for log in recent_logs %}
+                <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-light p-3 rounded-circle me-3">
+                            <i class="bi bi-tools text-primary"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ log.vehicle.name }}</h6>
+                            <p class="small text-muted mb-0">{{ log.get_service_type_display }} • {{ log.date }}</p>
+                        </div>
+                    </div>
+                    <span class="fw-bold text-success fs-5">₹{{ log.cost }}</span>
+                </div>
+                {% empty %}
+                <div class="text-center py-5">
+                    <p class="text-muted">No recent activities to show.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reminders Table -->
+<div class="card border-0 bg-white p-4" data-aos="fade-up">
+    <h5 class="fw-bold mb-4">Service Reminders</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr class="text-muted">
+                    <th>Vehicle</th>
+                    <th>Service Detail</th>
+                    <th>Target Date</th>
+                    <th class="text-end">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reminder in upcoming_reminders %}
+                <tr>
+                    <td class="fw-bold">{{ reminder.vehicle.name }}</td>
+                    <td>{{ reminder.get_service_type_display }}</td>
+                    <td class="text-muted">{{ reminder.next_service_date }}</td>
+                    <td class="text-end">
+                        {% if reminder.next_service_date < today %}
+                        <span class="badge bg-danger rounded-pill px-3">Overdue</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark rounded-pill px-3">Upcoming</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-5 text-muted">
+                        <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+                        <p>Your vehicles are all up to date!</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

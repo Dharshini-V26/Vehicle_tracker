@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics - Smart Tracker{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-down">
+    <div>
+        <h2 class="fw-bold mb-0">Performance Insights</h2>
+        <p class="text-muted mb-0">Visual data to help you save more and maintain better.</p>
+    </div>
+    <div class="bg-white p-2 rounded-pill shadow-sm d-flex gap-1">
+        <button class="btn btn-sm btn-primary rounded-pill px-3">Last 6 Months</button>
+        <button class="btn btn-sm btn-light rounded-pill px-3">Full Year</button>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Cost Distribution -->
+    <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="100">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Cost by Service Type</h5>
+                <i class="bi bi-pie-chart text-primary"></i>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="costTypeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cost Trend -->
+    <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="200">
+        <div class="card border-0 shadow-sm p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Monthly Expenditure</h5>
+                <i class="bi bi-graph-up text-success"></i>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="costTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Highlights -->
+<div class="row g-4 mt-4" data-aos="fade-up">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-4 text-center bg-white">
+            <h1 class="fw-bold text-primary mb-1">₹{{ total_cost|floatformat:0 }}</h1>
+            <p class="text-muted small fw-bold text-uppercase mb-0">Lifetime Spend</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-4 text-center bg-white">
+            <h1 class="fw-bold text-success mb-1">{{ total_vehicles }}</h1>
+            <p class="text-muted small fw-bold text-uppercase mb-0">Active Assets</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm p-4 text-center bg-white">
+            <h1 class="fw-bold text-warning mb-1">₹{{ average_cost|floatformat:0 }}</h1>
+            <p class="text-muted small fw-bold text-uppercase mb-0">Avg. Service Cost</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctxType = document.getElementById('costTypeChart').getContext('2d');
+    new Chart(ctxType, {
+        type: 'doughnut',
+        data: {
+            labels: {{ type_labels|safe }},
+            datasets: [{
+                data: {{ type_data|safe }},
+                backgroundColor: [
+                    '#0d6efd', '#20c997', '#ffc107', '#dc3545', '#6610f2', '#6f42c1'
+                ],
+                borderWidth: 0,
+                hoverOffset: 20
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true, font: { family: 'Outfit', size: 12 } } }
+            },
+            cutout: '70%'
+        }
+    });
+
+    const ctxTrend = document.getElementById('costTrendChart').getContext('2d');
+    const gradient = ctxTrend.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(13, 110, 253, 0.4)');
+    gradient.addColorStop(1, 'rgba(13, 110, 253, 0)');
+
+    new Chart(ctxTrend, {
+        type: 'line',
+        data: {
+            labels: {{ trend_labels|safe }},
+            datasets: [{
+                label: 'Monthly Cost (₹)',
+                data: {{ trend_data|safe }},
+                borderColor: '#0d6efd',
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#0d6efd',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, grid: { display: false }, ticks: { font: { family: 'Outfit' } } },
+                x: { grid: { display: false }, ticks: { font: { family: 'Outfit' } } }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+{% endblock %}

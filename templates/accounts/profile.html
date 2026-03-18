@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - Smart Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-lg-6" data-aos="zoom-in">
+        <div class="card p-5 border-0 shadow-lg rounded-4 text-center">
+            <div class="mb-4 position-relative d-inline-block mx-auto">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-lg animate__animated animate__pulse animate__infinite" 
+                     style="width: 120px; height: 120px; font-size: 3.5rem; font-weight: 700;">
+                    {{ user.username|first|upper }}
+                </div>
+                <div class="position-absolute bottom-0 end-0 bg-success border border-4 border-white rounded-circle p-2" style="width: 30px; height: 30px;"></div>
+            </div>
+            
+            <h2 class="fw-bold mb-1">{{ user.username }}</h2>
+            <p class="text-muted mb-4 fs-5">{{ user.email }}</p>
+            
+            <div class="row g-3 mb-5">
+                <div class="col-6">
+                    <div class="bg-light p-3 rounded-4">
+                        <p class="text-muted small fw-bold text-uppercase mb-1">Status</p>
+                        <span class="badge bg-success rounded-pill px-3">Active Member</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="bg-light p-3 rounded-4">
+                        <p class="text-muted small fw-bold text-uppercase mb-1">Joined</p>
+                        <span class="fw-bold">{{ user.date_joined|date:"M Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="opacity-10 mb-4">
+            
+            <div class="d-grid gap-3">
+                <a href="{% url 'dashboard' %}" class="btn btn-premium btn-lg">Back to Dashboard</a>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-lg rounded-pill w-100">Sign Out Safely</button>
+                </form>
+            </div>
+            
+            <div class="mt-5 pt-3">
+                <p class="small text-muted">Need to update your professional details? <br>
+                <a href="mailto:support@smarttracker.com" class="text-primary text-decoration-none">Contact Security Administrator</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

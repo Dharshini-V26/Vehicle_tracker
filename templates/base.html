@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Vehicle Tracker{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- AOS (Animate on Scroll) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    {% load static %}
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --accent-color: #00d4ff;
+            --sidebar-bg: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            color: white;
+            height: 100vh;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.6);
+            padding: 0.8rem 1.5rem;
+            margin: 0.2rem 1rem;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(8px);
+        }
+
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+        }
+
+        /* Content Area */
+        .main-workspace {
+            flex-grow: 1;
+            min-height: 100vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Hero Image Setup */
+        .hero-section {
+            background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), url("{% static 'images/hero_car.png' %}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+
+        /* Premium Cards */
+        .card {
+            border: none;
+            border-radius: 20px;
+            background: white;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Glass Text Effect */
+        .glass-text {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-premium:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    {% if user.is_authenticated %}
+    <div class="d-flex overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar d-none d-lg-flex flex-column sticky-top">
+            <div class="p-4 mb-4">
+                <h4 class="fw-bold animate__animated animate__fadeInDown"><i class="bi bi-truck me-2 text-primary"></i>Smart Tracker</h4>
+            </div>
+            <nav class="nav flex-column flex-nowrap mb-auto">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                    <i class="bi bi-grid-1x2-fill me-3"></i>Dashboard
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'vehicle_list' or request.resolver_match.url_name == 'vehicle_add' or request.resolver_match.url_name == 'vehicle_edit' %}active{% endif %}" href="{% url 'vehicle_list' %}">
+                    <i class="bi bi-car-front-fill me-3"></i>My Vehicles
+                </a>
+                <a class="nav-link {% if 'maintenance' in request.path %}active{% endif %}" href="{% url 'maintenance_list' %}">
+                    <i class="bi bi-wrench-adjustable-circle-fill me-3"></i>Service Logs
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}" href="{% url 'analytics' %}">
+                    <i class="bi bi-pie-chart-fill me-3"></i>Analytics
+                </a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
+                    <i class="bi bi-person-badge-fill me-3"></i>Profile
+                </a>
+            </nav>
+            <div class="p-4 mt-auto">
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link border-0 bg-transparent text-danger w-100 text-start">
+                        <i class="bi bi-door-open-fill me-3"></i>Logout
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-workspace p-4">
+            <!-- Mobile Header -->
+            <div class="d-lg-none mb-4 d-flex justify-content-between align-items-center">
+                <h4 class="fw-bold mb-0"><i class="bi bi-truck text-primary"></i> Tracker</h4>
+                <button class="btn btn-dark" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show animate__animated animate__bounceInRight" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% else %}
+    <!-- Public Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top px-3" style="background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px);">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'landing' %}">
+                <i class="bi bi-truck text-primary me-2"></i>SMART TRACKER
+            </a>
+            <div class="ms-auto d-flex gap-2">
+                <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light px-3 rounded-pill">Login</a>
+                <a href="{% url 'signup' %}" class="btn btn-sm btn-primary px-3 rounded-pill">Join Free</a>
+            </div>
+        </div>
+    </nav>
+    <div class="public-container">
+        {% block landing_content %}{% endblock %}
+        <div class="container py-5">
+            {% block content_public %}{% endblock %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+            easing: 'ease-out-back'
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
