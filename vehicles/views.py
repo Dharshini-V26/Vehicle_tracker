@@ -81,8 +81,9 @@ class DashboardView(LoginRequiredMixin, ListView):
             last_service = maintenance_records.filter(vehicle=v).aggregate(Max('date'))['date__max']
             if last_service:
                 days_since = (today - last_service).days
-                # 100% if < 180 days, linearly decrease to 0% at 540 days (1.5 years)
-                score = max(0, min(100, 100 - (max(0, days_since - 180) / 3.6)))
+                # 100% if < 180 days, linearly decrease to 0% at 730 days (2 years)
+                # (days_since - 180) / (730 - 180) * 100
+                score = max(0, min(100, 100 - (max(0, days_since - 180) / 5.5)))
             else:
                 score = 0
             vehicle_health.append({'name': v.name, 'score': int(score)})
@@ -113,8 +114,8 @@ class AnalyticsView(LoginRequiredMixin, TemplateView):
         type_labels = [dict(MaintenanceRecord.SERVICE_CHOICES).get(item['service_type']) for item in cost_by_type]
         type_data = [float(item['total']) for item in cost_by_type]
         
-        context['type_labels'] = json.dumps(type_labels)
-        context['type_data'] = json.dumps(type_data)
+        context['type_labels'] = type_labels
+        context['type_data'] = type_data
         
         # Monthly Cost Trend
         monthly_costs = {}
@@ -126,8 +127,8 @@ class AnalyticsView(LoginRequiredMixin, TemplateView):
         trend_labels = list(monthly_costs.keys())[-6:]
         trend_data = [monthly_costs[label] for label in trend_labels]
         
-        context['trend_labels'] = json.dumps(trend_labels)
-        context['trend_data'] = json.dumps(trend_data)
+        context['trend_labels'] = trend_labels
+        context['trend_data'] = trend_data
         
         return context
 
